@@ -3,7 +3,7 @@ FROM debian:bookworm-slim
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg2 \
-    pgrep \
+    procps \
     ca-certificates
 
 # Import GPG key for volkszaehler repository
