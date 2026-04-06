@@ -1,0 +1,39 @@
+name: Check vzlogger Updates
+
+on:
+  schedule:
+    # Check daily at 09:00 UTC
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Check for new vzlogger releases
+        id: check-release
+        run: |
+          LATEST_RELEASE=$(curl -s https://api.github.com/repos/volkszaehler/vzlogger/releases/latest | jq -r '.tag_name')
+          CURRENT_VERSION=$(grep "vzlogger=" Dockerfile | grep -oP '=\K[0-9.]+')
+          echo "Latest release: $LATEST_RELEASE"
+          echo "Current version: $CURRENT_VERSION"
+          if [ "$LATEST_RELEASE" != "v$CURRENT_VERSION" ]; then
+            echo "Update available!"
+            echo "update_available=true" >> $GITHUB_OUTPUT
+            echo "new_version=${LATEST_RELEASE#v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create issue for new version
+        if: steps.check-release.outputs.update_available == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Update vzlogger to ${{ steps.check-release.outputs.new_version }}',
+              body: 'A new vzlogger version is available: ${{ steps.check-release.outputs.new_version }}\n\nPlease update the Dockerfile and test before releasing.'
+            })
