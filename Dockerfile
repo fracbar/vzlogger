@@ -3,6 +3,7 @@ FROM debian:bookworm-slim
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg2 \
+    pgrep \
     ca-certificates
 
 # Import GPG key for volkszaehler repository
@@ -24,4 +25,4 @@ RUN useradd -m -s /sbin/nologin -G dialout vzlogger
 USER vzlogger
 
 # Entrypoint
-ENTRYPOINT ["vzlogger", "-c", "/etc/vzlogger.conf"]
+ENTRYPOINT ["vzlogger", "-c", "/etc/vzlogger.conf", "-f"]
