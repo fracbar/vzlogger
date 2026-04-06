@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
-RUN useradd -m -s /sbin/nologin vzlogger
+RUN useradd -m -s /sbin/nologin -G dialout vzlogger
 
 
 # Run as non-root user
