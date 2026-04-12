@@ -37,7 +37,7 @@ jobs:
       # Push
       - name: "Build and push with tag dev-${{ github.sha }}"
         id: docker_build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
